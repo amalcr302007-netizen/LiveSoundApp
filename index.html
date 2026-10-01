@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>Live Sound Player</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #07152f, #0b4d83, #087f8c);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.container {
+    width: 100%;
+    max-width: 450px;
+    background: rgba(255,255,255,0.10);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 25px;
+    padding: 25px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.35);
+}
+
+.logo {
+    text-align: center;
+    font-size: 38px;
+    margin-bottom: 8px;
+}
+
+h1 {
+    text-align: center;
+    font-size: 28px;
+    margin-bottom: 8px;
+}
+
+.subtitle {
+    text-align: center;
+    opacity: 0.75;
+    margin-bottom: 25px;
+}
+
+.card {
+    background: rgba(0,0,0,0.20);
+    border-radius: 18px;
+    padding: 20px;
+    margin-bottom: 18px;
+}
+
+.card h2 {
+    font-size: 18px;
+    margin-bottom: 15px;
+}
+
+button,
+.file-label {
+    width: 100%;
+    border: none;
+    padding: 14px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: 0.2s;
+}
+
+button:hover,
+.file-label:hover {
+    transform: scale(1.02);
+}
+
+.mic-button {
+    background: #00d4ff;
+    color: #001522;
+}
+
+.stop-button {
+    background: #ff5252;
+    color: white;
+}
+
+.file-label {
+    display: block;
+    text-align: center;
+    background: #ffffff;
+    color: #123;
+}
+
+input[type="file"] {
+    display: none;
+}
+
+.status {
+    text-align: center;
+    padding: 12px;
+    border-radius: 10px;
+    background: rgba(0,0,0,0.25);
+    margin-bottom: 18px;
+    font-size: 14px;
+}
+
+.volume-box {
+    margin-top: 15px;
+}
+
+.volume-box label {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+input[type="range"] {
+    width: 100%;
+}
+
+.song-name {
+    text-align: center;
+    margin-top: 12px;
+    font-size: 14px;
+    opacity: 0.8;
+    word-break: break-word;
+}
+
+.visualizer {
+    display: flex;
+    justify-content: center;
+    align-items: end;
+    height: 70px;
+    gap: 5px;
+    margin-bottom: 20px;
+}
+
+.bar {
+    width: 7px;
+    height: 15px;
+    background: #00d4ff;
+    border-radius: 10px;
+}
+
+.visualizer.active .bar {
+    animation: sound 0.5s infinite alternate;
+}
+
+.bar:nth-child(1) { animation-delay: 0.1s; }
+.bar:nth-child(2) { animation-delay: 0.2s; }
+.bar:nth-child(3) { animation-delay: 0.3s; }
+.bar:nth-child(4) { animation-delay: 0.4s; }
+.bar:nth-child(5) { animation-delay: 0.2s; }
+.bar:nth-child(6) { animation-delay: 0.3s; }
+.bar:nth-child(7) { animation-delay: 0.1s; }
+
+@keyframes sound {
+    from {
+        height: 12px;
+    }
+    to {
+        height: 60px;
+    }
+}
+
+.controls {
+    display: flex;
+    gap: 10px;
+}
+
+.controls button {
+    flex: 1;
+}
+
+.play {
+    background: #39e58c;
+    color: #042015;
+}
+
+.pause {
+    background: #ffc107;
+    color: #332600;
+}
+
+.stop-music {
+    background: #ff5252;
+    color: white;
+}
+
+.note {
+    font-size: 12px;
+    line-height: 1.5;
+    opacity: 0.7;
+    margin-top: 15px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="logo">🎤🔊</div>
+
+    <h1>Live Sound Player</h1>
+
+    <p class="subtitle">
+        Microphone + Music
+    </p>
+
+    <div class="status" id="status">
+        Microphone is OFF
+    </div>
+
+    <div class="visualizer" id="visualizer">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+    </div>
+
+    <!-- MICROPHONE -->
+    <div class="card">
+
+        <h2>🎤 Live Microphone</h2>
+
+        <button class="mic-button" id="startMic">
+            🎤 Start Microphone
+        </button>
+
+        <button class="stop-button" id="stopMic">
+            ⛔ Stop Microphone
+        </button>
+
+        <div class="volume-box">
+
+            <label>
+                <span>Microphone Volume</span>
+                <span id="micValue">100%</span>
+            </label>
+
+            <input
+                type="range"
+                id="micVolume"
+                min="0"
+                max="100"
+                value="100">
+
+        </div>
+
+    </div>
+
+    <!-- MUSIC -->
+    <div class="card">
+
+        <h2>🎵 Phone Music</h2>
+
+        <label class="file-label" for="audioFile">
+            📁 Choose Audio From Phone
+        </label>
+
+        <input
+            type="file"
+            id="audioFile"
+            accept="audio/*">
+
+        <div class="song-name" id="songName">
+            No song selected
+        </div>
+
+        <div class="controls">
+
+            <button class="play" id="playMusic">
+                ▶ Play
+            </button>
+
+            <button class="pause" id="pauseMusic">
+                ⏸ Pause
+            </button>
+
+            <button class="stop-music" id="stopMusic">
+                ⏹ Stop
+            </button>
+
+        </div>
+
+        <div class="volume-box">
+
+            <label>
+                <span>Music Volume</span>
+                <span id="musicValue">100%</span>
+            </label>
+
+            <input
+                type="range"
+                id="musicVolume"
+                min="0"
+                max="100"
+                value="100">
+
+        </div>
+
+    </div>
+
+    <p class="note">
+        ⚠️ Keep the speaker volume low while using the microphone.
+        High volume can cause audio feedback.
+    </p>
+
+</div>
+
+<script>
+
+let audioContext;
+let micStream;
+let micSource;
+let micGain;
+
+let audioElement = new Audio();
+let musicSource;
+let musicGain;
+
+const startMic = document.getElementById("startMic");
+const stopMic = document.getElementById("stopMic");
+
+const status = document.getElementById("status");
+const visualizer = document.getElementById("visualizer");
+
+const micVolume = document.getElementById("micVolume");
+const musicVolume = document.getElementById("musicVolume");
+
+const micValue = document.getElementById("micValue");
+const musicValue = document.getElementById("musicValue");
+
+const audioFile = document.getElementById("audioFile");
+const songName = document.getElementById("songName");
+
+const playMusic = document.getElementById("playMusic");
+const pauseMusic = document.getElementById("pauseMusic");
+const stopMusic = document.getElementById("stopMusic");
+
+
+// -------------------------------
+// START MICROPHONE
+// -------------------------------
+
+startMic.addEventListener("click", async () => {
+
+    try {
+
+        audioContext =
+            audioContext ||
+            new (window.AudioContext ||
+                 window.webkitAudioContext)();
+
+        await audioContext.resume();
+
+        micStream =
+            await navigator.mediaDevices.getUserMedia({
+                audio: {
+                    echoCancellation: false,
+                    noiseSuppression: false,
+                    autoGainControl: false
+                }
+            });
+
+        micSource =
+            audioContext.createMediaStreamSource(
+                micStream
+            );
+
+        micGain =
+            audioContext.createGain();
+
+        micGain.gain.value =
+            micVolume.value / 100;
+
+        /*
+         * Microphone
+         *     ↓
+         * Gain
+         *     ↓
+         * Speaker
+         */
+
+        micSource.connect(micGain);
+
+        micGain.connect(
+            audioContext.destination
+        );
+
+        status.textContent =
+            "🟢 Microphone is LIVE";
+
+        visualizer.classList.add("active");
+
+    } catch (error) {
+
+        console.error(error);
+
+        status.textContent =
+            "❌ Microphone permission denied";
+
+        alert(
+            "Please allow microphone permission."
+        );
+    }
+
+});
+
+
+// -------------------------------
+// STOP MICROPHONE
+// -------------------------------
+
+stopMic.addEventListener("click", () => {
+
+    if (micStream) {
+
+        micStream.getTracks().forEach(track => {
+            track.stop();
+        });
+
+        micStream = null;
+    }
+
+    if (micSource) {
+        micSource.disconnect();
+        micSource = null;
+    }
+
+    if (micGain) {
+        micGain.disconnect();
+        micGain = null;
+    }
+
+    status.textContent =
+        "Microphone is OFF";
+
+    visualizer.classList.remove("active");
+
+});
+
+
+// -------------------------------
+// MICROPHONE VOLUME
+// -------------------------------
+
+micVolume.addEventListener("input", () => {
+
+    const value = micVolume.value;
+
+    micValue.textContent =
+        value + "%";
+
+    if (micGain) {
+        micGain.gain.value =
+            value / 100;
+    }
+
+});
+
+
+// -------------------------------
+// SELECT MUSIC
+// -------------------------------
+
+audioFile.addEventListener("change", () => {
+
+    const file = audioFile.files[0];
+
+    if (!file) return;
+
+    songName.textContent =
+        "🎵 " + file.name;
+
+    const url =
+        URL.createObjectURL(file);
+
+    audioElement.src = url;
+
+    audioElement.load();
+
+});
+
+
+// -------------------------------
+// PLAY MUSIC
+// -------------------------------
+
+playMusic.addEventListener("click", async () => {
+
+    if (!audioFile.files.length) {
+
+        alert(
+            "Please choose a song first."
+        );
+
+        return;
+    }
+
+    try {
+
+        audioContext =
+            audioContext ||
+            new (window.AudioContext ||
+                 window.webkitAudioContext)();
+
+        await audioContext.resume();
+
+        /*
+         * Create music audio node
+         * only once.
+         */
+
+        if (!musicSource) {
+
+            musicSource =
+                audioContext.createMediaElementSource(
+                    audioElement
+                );
+
+            musicGain =
+                audioContext.createGain();
+
+            musicSource.connect(musicGain);
+
+            musicGain.connect(
+                audioContext.destination
+            );
+        }
+
+        musicGain.gain.value =
+            musicVolume.value / 100;
+
+        await audioElement.play();
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            "Unable to play this audio file."
+        );
+
+    }
+
+});
+
+
+// -------------------------------
+// PAUSE MUSIC
+// -------------------------------
+
+pauseMusic.addEventListener("click", () => {
+
+    audioElement.pause();
+
+});
+
+
+// -------------------------------
+// STOP MUSIC
+// -------------------------------
+
+stopMusic.addEventListener("click", () => {
+
+    audioElement.pause();
+
+    audioElement.currentTime = 0;
+
+});
+
+
+// -------------------------------
+// MUSIC VOLUME
+// -------------------------------
+
+musicVolume.addEventListener("input", () => {
+
+    const value =
+        musicVolume.value;
+
+    musicValue.textContent =
+        value + "%";
+
+    if (musicGain) {
+
+        musicGain.gain.value =
+            value / 100;
+    }
+
+});
+
+
+// -------------------------------
+// CLEANUP
+// -------------------------------
+
+window.addEventListener("beforeunload", () => {
+
+    if (micStream) {
+
+        micStream.getTracks().forEach(
+            track => track.stop()
+        );
+    }
+
+});
+
+</script>
+
+</body>
+</html>
